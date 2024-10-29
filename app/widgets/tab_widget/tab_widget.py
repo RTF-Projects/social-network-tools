@@ -29,7 +29,9 @@ class TabWidget(QWidget):
         self.tabs.addTab(self.vk_tab, '')
         self.tabs.addTab(self.settings_tab, '')
 
-        self.telegram_tab.layout = QGridLayout(self)
+        self.telegram_tab.layout = QVBoxLayout(self)
+        self.telegram_tab.layout.addWidget(self.telegram_window.leave_chat_button)
+        self.telegram_tab.layout.addStretch()
         self.telegram_tab.setLayout(self.telegram_tab.layout)
 
         self.vk_tab.layout = QVBoxLayout(self)
