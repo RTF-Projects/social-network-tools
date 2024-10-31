@@ -1,12 +1,13 @@
 import asyncio
+from datetime import datetime, timedelta
 
 import aiohttp
 from PyQt5.QtWidgets import QWidget, QPushButton
+from qasync import asyncSlot, asyncClose
+from telethon import TelegramClient
+
 from app.const import BUTTON_HEIGHT
 from app.locales.locales import locales
-from qasync import asyncSlot, asyncClose
-from datetime import datetime, timedelta
-from telethon import TelegramClient
 
 
 class TelegramWindow(QWidget):
@@ -52,7 +53,26 @@ class TelegramWindow(QWidget):
                         groups_to_leave.append(group)
                         break
 
-            print(groups_to_leave)
+        print(groups_to_leave)
+
+    @asyncSlot()
+    async def leave_chat_unread(self):
+        await self.client.start()
+
+        groups_to_leave = []
+        groups = []
+
+        async for dialog in self.client.iter_dialogs():
+            if dialog.is_group and dialog.dialog.unread_count > 0:
+                groups.append([dialog.id, dialog.dialog.read_inbox_max_id])
+
+        for group in groups[:1]:
+            group_entity = await self.client.get_entity(group[0])
+            async for message in self.client.iter_messages(group_entity, offset_id=group[1]):
+                groups_to_leave.append([group[0], message.date])
+                break
+
+        print(groups_to_leave)
 
     @asyncClose
     async def closeEvent(self, event):
