@@ -3,7 +3,8 @@ locales = {
         "telegram": "Telegram",
         "vk": "VK",
         "settings": "Настройки",
-        "leave_chat": "Покинуть чат",
+        "leave_readonly_chats": "Покинуть чаты, в которые давно не писал",
+        "leave_unread_chats": "Покинуть нечитаемые чаты",
         "token_telegram": "Токен telegram",
         "token_hash_telegram": "Хэш-токен telegram",
 
@@ -83,7 +84,8 @@ locales = {
         "telegram": "Telegram",
         "vk": "VK",
         "settings": "Settings",
-        "leave_chat": "Leave chat",
+        "leave_readonly_chats": "Leave chats that you haven't written to in a long time",
+        "leave_unread_chats": "Leave unread chats",
         "token_telegram": "Token telegram",
         "token_hash_telegram": "Hash-token telegram",
 
