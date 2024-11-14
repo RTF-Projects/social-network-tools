@@ -7,6 +7,7 @@ locales = {
         "leave_unread_chats": "Покинуть нечитаемые чаты",
         "token_telegram": "Токен telegram",
         "token_hash_telegram": "Хэш-токен telegram",
+        "kick_inactive_users": "Исключить неактивных пользователей",
 
         "invalid_file_format": "Неверный формат файла",
         "unknown_format_file": "Файл неизвестного формата",
@@ -88,6 +89,7 @@ locales = {
         "leave_unread_chats": "Leave unread chats",
         "token_telegram": "Token telegram",
         "token_hash_telegram": "Hash-token telegram",
+        "kick_inactive_users": "Kick inactive users",
 
         "invalid_file_format": "Invalid file format",
         "unknown_format_file": "Unknown format file",

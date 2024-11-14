@@ -13,3 +13,9 @@ class Group:
         self.unread_count = unread_count
         self.archived = archived
         self.creation_date = creation_date
+
+    def __hash__(self):
+        return self.id
+
+    def __eq__(self, other):
+        return self.id == other.id
