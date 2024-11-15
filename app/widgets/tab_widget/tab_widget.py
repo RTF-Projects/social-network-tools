@@ -4,6 +4,7 @@ from app.locales.locales import locales
 from app.windows.telegram_window import TelegramWindow
 from app.windows.vk_window import VKWindow
 from app.windows.settings_window import SettingsWindow
+from app.windows.statistics_window import StatisticsWindow
 
 
 class TabWidget(QWidget):
@@ -15,11 +16,13 @@ class TabWidget(QWidget):
         self.telegram_tab = QWidget()
         self.vk_tab = QWidget()
         self.settings_tab = QWidget()
+        self.statistics_tab = QWidget()
         self.setFixedSize(1600, 1200)
 
         self.settings_window = SettingsWindow()
         self.telegram_window = TelegramWindow(self.settings_window)
         self.vk_window = VKWindow(self.settings_window)
+        self.statistics_window = StatisticsWindow()
 
         self.settings_window.telegram_window = self.telegram_window
         self.settings_window.vk_window = self.vk_window
@@ -28,6 +31,7 @@ class TabWidget(QWidget):
         self.tabs.addTab(self.telegram_tab, '')
         self.tabs.addTab(self.vk_tab, '')
         self.tabs.addTab(self.settings_tab, '')
+        self.tabs.addTab(self.statistics_tab, '')
 
         self.telegram_tab.layout = QVBoxLayout(self)
         self.telegram_tab.layout.addWidget(self.telegram_window.leave_from_readonly_chats_button)
@@ -49,6 +53,14 @@ class TabWidget(QWidget):
         self.settings_tab.layout.addStretch()
         self.settings_tab.setLayout(self.settings_tab.layout)
 
+        self.statistics_tab.layout = QVBoxLayout(self)
+        self.statistics_tab.layout.addWidget(self.statistics_window.chat_activity_widget)
+        self.statistics_tab.layout.addWidget(self.statistics_window.chat_selector)
+        self.statistics_tab.layout.addWidget(self.statistics_window.messages_and_participants_widget)
+        self.statistics_tab.layout.addWidget(self.statistics_window.index_activity_combo_widget)
+        self.statistics_tab.layout.addStretch()
+        self.statistics_tab.setLayout(self.statistics_tab.layout)
+
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
 
@@ -59,3 +71,4 @@ class TabWidget(QWidget):
         self.tabs.setTabText(0, locales[self.settings_window.locale]['telegram'])
         self.tabs.setTabText(1, locales[self.settings_window.locale]['vk'])
         self.tabs.setTabText(2, locales[self.settings_window.locale]['settings'])
+        self.tabs.setTabText(3, locales[self.settings_window.locale]['statistics_telegram'])
