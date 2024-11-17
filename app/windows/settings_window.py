@@ -97,6 +97,9 @@ class SettingsWindow(QWidget):
         self.token_input_telegram.setText(str(self.token_telegram))
         self.token_hash_input_telegram.setText(self.token_hash_telegram)
 
+        self.token_input_telegram.setEchoMode(QLineEdit.Password)
+        self.token_hash_input_telegram.setEchoMode(QLineEdit.Password)
+
         self.save_button.clicked.connect(self.save)
         self.save_button.setFixedHeight(BUTTON_HEIGHT)
 
