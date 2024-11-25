@@ -34,10 +34,18 @@ class TabWidget(QWidget):
         self.tabs.addTab(self.statistics_tab, '')
 
         self.telegram_tab.layout = QVBoxLayout(self)
-        self.telegram_tab.layout.addWidget(self.telegram_window.leave_from_readonly_chats_button)
-        self.telegram_tab.layout.addWidget(self.telegram_window.leave_from_unread_chats_button)
-        self.telegram_tab.layout.addWidget(self.telegram_window.kick_inactive_users_button)
-        self.telegram_tab.layout.addStretch()
+        self.telegram_tab.layout.addWidget(self.telegram_window.readonly_chats_days)
+        self.telegram_tab.layout.addWidget(self.telegram_window.readonly_chats_list)
+        self.telegram_tab.layout.addWidget(self.telegram_window.find_readonly_chats_button)
+
+        self.telegram_tab.layout.addWidget(self.telegram_window.unread_chats_days)
+        self.telegram_tab.layout.addWidget(self.telegram_window.unread_chats_list)
+        self.telegram_tab.layout.addWidget(self.telegram_window.find_unread_chats_button)
+
+        self.telegram_tab.layout.addWidget(self.telegram_window.inactive_users_days)
+        self.telegram_tab.layout.addWidget(self.telegram_window.inactive_users_list)
+        self.telegram_tab.layout.addWidget(self.telegram_window.find_inactive_users_button)
+
         self.telegram_tab.setLayout(self.telegram_tab.layout)
 
         self.vk_tab.layout = QVBoxLayout(self)
