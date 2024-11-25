@@ -22,7 +22,7 @@ class TabWidget(QWidget):
         self.settings_window = SettingsWindow()
         self.telegram_window = TelegramWindow(self.settings_window)
         self.vk_window = VKWindow(self.settings_window)
-        self.statistics_window = StatisticsWindow()
+        self.statistics_window = StatisticsWindow(self.settings_window)
 
         self.settings_window.telegram_window = self.telegram_window
         self.settings_window.vk_window = self.vk_window
@@ -54,6 +54,7 @@ class TabWidget(QWidget):
         self.settings_tab.setLayout(self.settings_tab.layout)
 
         self.statistics_tab.layout = QVBoxLayout(self)
+        self.statistics_tab.layout.addWidget(self.statistics_window.load_button)
         self.statistics_tab.layout.addWidget(self.statistics_window.chat_activity_widget)
         self.statistics_tab.layout.addWidget(self.statistics_window.chat_selector)
         self.statistics_tab.layout.addWidget(self.statistics_window.messages_and_participants_widget)
