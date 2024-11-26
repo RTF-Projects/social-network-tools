@@ -80,15 +80,17 @@ class StatisticsWindow(QWidget):
         self.update_chat_activity()
         self.update_chat_selector()
 
-        self.chat_statistics = await self.get_chat_statistics(self.all_chats[0]['dialog_id'])
+        message_statistics = await self.get_messages_statistics(self.all_chats[0]['dialog_id'])
+
+        self.chat_statistics = message_statistics['chat_statistics']
         self.update_messages()
         self.update_messages_chart()
 
-        self.participants_statistics = await self.get_chat_participant_statistics(self.all_chats[0]['dialog_id'])
+        self.participants_statistics = message_statistics['participant_statistics']
         self.update_participants()
         self.update_participants_chart()
 
-        self.index_activity = await self.get_chat_index_activity_statistics(self.all_chats[0]['dialog_id'])
+        self.index_activity = message_statistics['index_activity']
         self.update_index_activity()
         self.update_index_activity_chart()
 
@@ -104,15 +106,17 @@ class StatisticsWindow(QWidget):
         self.chat_selector.blockSignals(True)
         self.chat_selector.setEnabled(False)
 
-        self.chat_statistics = await self.get_chat_statistics(self.all_chats[current_index]['dialog_id'])
+        message_statistics = await self.get_messages_statistics(self.all_chats[current_index]['dialog_id'])
+
+        self.chat_statistics = message_statistics['chat_statistics']
         self.update_messages()
         self.update_messages_chart()
 
-        self.participants_statistics = await self.get_chat_participant_statistics(self.all_chats[current_index]['dialog_id'])
+        self.participants_statistics = message_statistics['participant_statistics']
         self.update_participants()
         self.update_participants_chart()
 
-        self.index_activity = await self.get_chat_index_activity_statistics(self.all_chats[current_index]['dialog_id'])
+        self.index_activity = message_statistics['index_activity']
         self.update_index_activity()
         self.update_index_activity_chart()
 
@@ -152,7 +156,7 @@ class StatisticsWindow(QWidget):
         return sorted_groups, all_chats
 
 
-    async def get_chat_statistics(self, dialog_id):
+    async def get_messages_statistics(self, dialog_id):
         await self.client.start()
 
         group_entity = await self.client.get_entity(dialog_id)
@@ -162,182 +166,121 @@ class StatisticsWindow(QWidget):
         start_date_week = now - timedelta(days=7)
         start_date_month = now - timedelta(days=30)
 
-        count_today = 0
-        count_week = 0
-        count_month = 0
-        daily_message_counts = {}
+        chat_statistics_count_today = 0
+        chat_statistics_count_week = 0
+        chat_statistics_count_month = 0
+        chat_statistics_daily_message_counts = {}
 
-        async for message in self.client.iter_messages(group_entity, offset_date=start_date_month, reverse=True):
-            if message.date >= start_date_month:
-                message_date = str(message.date.date())
-
-                if message_date in daily_message_counts:
-                    daily_message_counts[message_date] += 1
-                else:
-                    daily_message_counts[message_date] = 1
-
-                if message.date >= start_date_today:
-                    count_today += 1
-                if message.date >= start_date_week:
-                    count_week += 1
-
-                count_month += 1
-
-            else:
-                break
-
-        daily_counts = {}
-        for day_offset in range(30):
-            day = now - timedelta(days=day_offset)
-            day_str = str(day.date())
-
-            if day_str in daily_message_counts:
-                daily_counts[day_str] = daily_message_counts[day_str]
-            else:
-                daily_counts[day_str] = 0
-
-        return {
-            'dialog_id': dialog_id,
-            'count_today': count_today,
-            'count_week': count_week,
-            'count_month': count_month,
-            'daily_counts': daily_counts
-        }
-
-
-    async def get_chat_participant_statistics(self, dialog_id):
-        await self.client.start()
-
-        now = datetime.now(timezone.utc)
-        start_today = now - timedelta(days=1)
-        start_week = now - timedelta(days=7)
-        start_month = now - timedelta(days=30)
-
-        participants = await self.client.get_participants(dialog_id)
-
-        total_count_participants = len(participants)
+        total_count_participants = (await self.client.get_participants(dialog_id, limit=0)).total
         joined_today = 0
         joined_week = 0
         joined_month = 0
-
         daily_joins_counts = {}
 
-        async for message in self.client.iter_messages(dialog_id, offset_date=start_month, reverse=True):
-            if isinstance(message.action, (MessageActionChatAddUser, MessageActionChatJoinedByLink)):
-                join_date = message.date
-                join_date_str = str(message.date.date())
+        reposts_today = 0
+        reposts_week = 0
+        reposts_month = 0
+        mentions_today = 0
+        mentions_week = 0
+        mentions_month = 0
+        reactions_today = 0
+        reactions_week = 0
+        reactions_month = 0
+        daily_reposts_counts = {}
+        daily_mentions_counts = {}
+        daily_reactions_counts = {}
 
-                if join_date >= start_today:
+        async for message in self.client.iter_messages(group_entity, offset_date=start_date_month, reverse=True):
+            message_date = str(message.date.date())
+
+            if message_date in chat_statistics_daily_message_counts:
+                chat_statistics_daily_message_counts[message_date] += 1
+            else:
+                chat_statistics_daily_message_counts[message_date] = 1
+
+            if message.date >= start_date_today:
+                chat_statistics_count_today += 1
+            if message.date >= start_date_week:
+                chat_statistics_count_week += 1
+
+            chat_statistics_count_month += 1
+
+            if isinstance(message.action, (MessageActionChatAddUser, MessageActionChatJoinedByLink)):
+                if message.date >= start_date_today:
                     joined_today += 1
 
-                if join_date >= start_week:
+                if message.date >= start_date_week:
                     joined_week += 1
 
-                if join_date >= start_month:
+                if message.date >= start_date_month:
                     joined_month += 1
 
-                    if join_date_str in daily_joins_counts:
-                        daily_joins_counts[join_date_str] += 1
+                    if message_date in daily_joins_counts:
+                        daily_joins_counts[message_date] += 1
                     else:
-                        daily_joins_counts[join_date_str] = 1
+                        daily_joins_counts[message_date] = 1
 
+            if message.fwd_from:
+                if message.date >= start_date_today:
+                    reposts_today += 1
+                if message.date >= start_date_week:
+                    reposts_week += 1
+                if message.date >= start_date_month:
+                    reposts_month += 1
+
+                    if message_date in daily_reposts_counts:
+                        daily_reposts_counts[message_date] += 1
+                    else:
+                        daily_reposts_counts[message_date] = 1
+
+            if message.entities:
+                for entity in message.entities:
+                    if isinstance(entity, MessageEntityMention):
+                        if message.date >= start_date_today:
+                            mentions_today += 1
+                        if message.date >= start_date_week:
+                            mentions_week += 1
+                        if message.date >= start_date_month:
+                            mentions_month += 1
+
+                            if message_date in daily_mentions_counts:
+                                daily_mentions_counts[message_date] += 1
+                            else:
+                                daily_mentions_counts[message_date] = 1
+
+            if message.reactions:
+                reaction_count = sum(reaction.count for reaction in message.reactions.results)
+                if message.date >= start_date_today:
+                    reactions_today += reaction_count
+                if message.date >= start_date_week:
+                    reactions_week += reaction_count
+                if message.date >= start_date_month:
+                    reactions_month += reaction_count
+
+                    if message_date in daily_reactions_counts:
+                        daily_reactions_counts[message_date] += 1
+                    else:
+                        daily_reactions_counts[message_date] = 1
 
         daily_joins = {}
+        chat_statistics_daily_counts = {}
+        daily_reposts = {}
+        daily_mentions = {}
+        daily_reactions = {}
+
         for day_offset in range(30):
             day = now - timedelta(days=day_offset)
             day_str = str(day.date())
+
+            if day_str in chat_statistics_daily_message_counts:
+                chat_statistics_daily_counts[day_str] = chat_statistics_daily_message_counts[day_str]
+            else:
+                chat_statistics_daily_counts[day_str] = 0
 
             if day_str in daily_joins_counts:
                 daily_joins[day_str] = daily_joins_counts[day_str]
             else:
                 daily_joins[day_str] = 0
-
-        return {
-            'dialog_id': dialog_id,
-            'total_count_participants': total_count_participants,
-            'joined_today': joined_today,
-            'joined_week': joined_week,
-            'joined_month': joined_month,
-            'daily_joins': daily_joins
-        }
-
-
-    async def get_chat_index_activity_statistics(self, dialog_id):
-        await self.client.start()
-
-        now = datetime.now(timezone.utc)
-        start_today = now - timedelta(days=1)
-        start_week = now - timedelta(days=7)
-        start_month = now - timedelta(days=30)
-
-        reposts_today = 0
-        reposts_week = 0
-        reposts_month = 0
-
-        mentions_today = 0
-        mentions_week = 0
-        mentions_month = 0
-
-        reactions_today = 0
-        reactions_week = 0
-        reactions_month = 0
-
-        daily_reposts_counts = {}
-        daily_mentions_counts = {}
-        daily_reactions_counts = {}
-
-        async for message in self.client.iter_messages(dialog_id, offset_date=start_month, reverse=True):
-            message_date = message.date
-            message_date_str = str(message.date.date())
-
-            if message.fwd_from:
-                if message_date >= start_today:
-                    reposts_today += 1
-                if message_date >= start_week:
-                    reposts_week += 1
-                if message_date >= start_month:
-                    reposts_month += 1
-
-                    if message_date_str in daily_reposts_counts:
-                        daily_reposts_counts[message_date_str] += 1
-                    else:
-                        daily_reposts_counts[message_date_str] = 1
-
-            if message.entities:
-                for entity in message.entities:
-                    if isinstance(entity, MessageEntityMention):
-                        if message_date >= start_today:
-                            mentions_today += 1
-                        if message_date >= start_week:
-                            mentions_week += 1
-                        if message_date >= start_month:
-                            mentions_month += 1
-
-                            if message_date_str in daily_mentions_counts:
-                                daily_mentions_counts[message_date_str] += 1
-                            else:
-                                daily_mentions_counts[message_date_str] = 1
-
-            if message.reactions:
-                reaction_count = sum(reaction.count for reaction in message.reactions.results)
-                if message_date >= start_today:
-                    reactions_today += reaction_count
-                if message_date >= start_week:
-                    reactions_week += reaction_count
-                if message_date >= start_month:
-                    reactions_month += reaction_count
-
-                    if message_date_str in daily_reactions_counts:
-                        daily_reactions_counts[message_date_str] += 1
-                    else:
-                        daily_reactions_counts[message_date_str] = 1
-
-        daily_reposts = {}
-        daily_mentions = {}
-        daily_reactions = {}
-        for day_offset in range(30):
-            day = now - timedelta(days=day_offset)
-            day_str = str(day.date())
 
             if day_str in daily_reposts_counts:
                 daily_reposts[day_str] = daily_reposts_counts[day_str]
@@ -355,23 +298,40 @@ class StatisticsWindow(QWidget):
                 daily_reactions[day_str] = 0
 
         return {
-            'reposts': {
-                'today': reposts_today,
-                'week': reposts_week,
-                'month': reposts_month,
-                'daily': daily_reposts,
+            'chat_statistics': {
+                'dialog_id': dialog_id,
+                'count_today': chat_statistics_count_today,
+                'count_week': chat_statistics_count_week,
+                'count_month': chat_statistics_count_month,
+                'daily_counts': chat_statistics_daily_counts
             },
-            'mentions': {
-                'today': mentions_today,
-                'week': mentions_week,
-                'month': mentions_month,
-                'daily': daily_mentions,
+            'participant_statistics':{
+                'dialog_id': dialog_id,
+                'total_count_participants': total_count_participants,
+                'joined_today': joined_today,
+                'joined_week': joined_week,
+                'joined_month': joined_month,
+                'daily_joins': daily_joins
             },
-            'reactions': {
-                'today': reactions_today,
-                'week': reactions_week,
-                'month': reactions_month,
-                'daily': daily_reactions,
+            'index_activity': {
+                'reposts': {
+                    'today': reposts_today,
+                    'week': reposts_week,
+                    'month': reposts_month,
+                    'daily': daily_reposts,
+                },
+                'mentions': {
+                    'today': mentions_today,
+                    'week': mentions_week,
+                    'month': mentions_month,
+                    'daily': daily_mentions,
+                },
+                'reactions': {
+                    'today': reactions_today,
+                    'week': reactions_week,
+                    'month': reactions_month,
+                    'daily': daily_reactions,
+                }
             }
         }
 
@@ -431,7 +391,7 @@ class StatisticsWindow(QWidget):
 
     def update_messages(self):
         self.messages_label.setText('Сообщения')
-        self.messages_today_label.setText(f'За сегодня: {self.chat_statistics['count_today']}')
+        self.messages_today_label.setText(f'За 24 часа: {self.chat_statistics['count_today']}')
         self.messages_week_label.setText(f'За неделю: {self.chat_statistics['count_week']}')
         self.messages_month_label.setText(f'За месяц: {self.chat_statistics['count_month']}')
 
@@ -452,7 +412,7 @@ class StatisticsWindow(QWidget):
 
         self.participants_label.setText('Участники')
         self.participants_all_label.setText(f'Всего: {self.participants_statistics['total_count_participants']}')
-        self.participants_today_label.setText(f'За сегодня: {sign_today} {abs(self.participants_statistics['joined_today'])}')
+        self.participants_today_label.setText(f'За 24 часа: {sign_today} {abs(self.participants_statistics['joined_today'])}')
         self.participants_week_label.setText(f'За неделю: {sign_week} {abs(self.participants_statistics['joined_week'])}')
         self.participants_month_label.setText(f'За месяц: {sign_month} {abs(self.participants_statistics['joined_month'])}')
 
@@ -471,17 +431,17 @@ class StatisticsWindow(QWidget):
         self.index_activity_label.setFixedWidth(100)
 
         self.mentions_label.setText(f'Упоминаний:')
-        self.mentions_label_today.setText(f'За сегодня: {self.index_activity['mentions']['today']}')
+        self.mentions_label_today.setText(f'За 24 часа: {self.index_activity['mentions']['today']}')
         self.mentions_label_week.setText(f'За неделю: {self.index_activity['mentions']['week']}')
         self.mentions_label_month.setText(f'За месяц: {self.index_activity['mentions']['month']}')
 
         self.reposts_label.setText(f'Репостов:')
-        self.reposts_label_today.setText(f'За сегодня: {self.index_activity['reposts']['today']}')
+        self.reposts_label_today.setText(f'За 24 часа: {self.index_activity['reposts']['today']}')
         self.reposts_label_week.setText(f'За неделю: {self.index_activity['reposts']['week']}')
         self.reposts_label_month.setText(f'За месяц: {self.index_activity['reposts']['month']}')
 
         self.rations_label.setText(f'Реакций:')
-        self.rations_label_today.setText(f'За сегодня: {self.index_activity['reactions']['today']}')
+        self.rations_label_today.setText(f'За 24 часа: {self.index_activity['reactions']['today']}')
         self.rations_label_week.setText(f'За неделю: {self.index_activity['reactions']['week']}')
         self.rations_label_month.setText(f'За месяц: {self.index_activity['reactions']['month']}')
 
