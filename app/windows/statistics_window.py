@@ -391,9 +391,9 @@ class StatisticsWindow(QWidget):
 
     def update_messages(self):
         self.messages_label.setText('Сообщения')
-        self.messages_today_label.setText(f'За 24 часа: {self.chat_statistics['count_today']}')
-        self.messages_week_label.setText(f'За неделю: {self.chat_statistics['count_week']}')
-        self.messages_month_label.setText(f'За месяц: {self.chat_statistics['count_month']}')
+        self.messages_today_label.setText(f"За 24 часа: {self.chat_statistics['count_today']}")
+        self.messages_week_label.setText(f"За неделю: {self.chat_statistics['count_week']}'")
+        self.messages_month_label.setText(f"За месяц: {self.chat_statistics['count_month']}")
 
 
     def update_messages_chart(self):
@@ -411,10 +411,10 @@ class StatisticsWindow(QWidget):
         sign_month = '+' if self.participants_statistics['joined_month'] >= 0 else '-'
 
         self.participants_label.setText('Участники')
-        self.participants_all_label.setText(f'Всего: {self.participants_statistics['total_count_participants']}')
-        self.participants_today_label.setText(f'За 24 часа: {sign_today} {abs(self.participants_statistics['joined_today'])}')
-        self.participants_week_label.setText(f'За неделю: {sign_week} {abs(self.participants_statistics['joined_week'])}')
-        self.participants_month_label.setText(f'За месяц: {sign_month} {abs(self.participants_statistics['joined_month'])}')
+        self.participants_all_label.setText(f"Всего: {self.participants_statistics['total_count_participants']}")
+        self.participants_today_label.setText(f"За 24 часа: {sign_today} {abs(self.participants_statistics['joined_today'])}")
+        self.participants_week_label.setText(f"За неделю: {sign_week} {abs(self.participants_statistics['joined_week'])}")
+        self.participants_month_label.setText(f"За месяц: {sign_month} {abs(self.participants_statistics['joined_month'])}")
 
 
     def update_participants_chart(self):
@@ -431,19 +431,19 @@ class StatisticsWindow(QWidget):
         self.index_activity_label.setFixedWidth(100)
 
         self.mentions_label.setText(f'Упоминаний:')
-        self.mentions_label_today.setText(f'За 24 часа: {self.index_activity['mentions']['today']}')
-        self.mentions_label_week.setText(f'За неделю: {self.index_activity['mentions']['week']}')
-        self.mentions_label_month.setText(f'За месяц: {self.index_activity['mentions']['month']}')
+        self.mentions_label_today.setText(f"За 24 часа: {self.index_activity['mentions']['today']}")
+        self.mentions_label_week.setText(f"За неделю: {self.index_activity['mentions']['week']}")
+        self.mentions_label_month.setText(f"За месяц: {self.index_activity['mentions']['month']}")
 
         self.reposts_label.setText(f'Репостов:')
-        self.reposts_label_today.setText(f'За 24 часа: {self.index_activity['reposts']['today']}')
-        self.reposts_label_week.setText(f'За неделю: {self.index_activity['reposts']['week']}')
-        self.reposts_label_month.setText(f'За месяц: {self.index_activity['reposts']['month']}')
+        self.reposts_label_today.setText(f"За 24 часа: {self.index_activity['reposts']['today']}")
+        self.reposts_label_week.setText(f"За неделю: {self.index_activity['reposts']['week']}")
+        self.reposts_label_month.setText(f"За месяц: {self.index_activity['reposts']['month']}")
 
         self.rations_label.setText(f'Реакций:')
-        self.rations_label_today.setText(f'За 24 часа: {self.index_activity['reactions']['today']}')
-        self.rations_label_week.setText(f'За неделю: {self.index_activity['reactions']['week']}')
-        self.rations_label_month.setText(f'За месяц: {self.index_activity['reactions']['month']}')
+        self.rations_label_today.setText(f"За 24 часа: {self.index_activity['reactions']['today']}")
+        self.rations_label_week.setText(f"За неделю: {self.index_activity['reactions']['week']}")
+        self.rations_label_month.setText(f"За месяц: {self.index_activity['reactions']['month']}")
 
 
     def update_index_activity_chart(self):
