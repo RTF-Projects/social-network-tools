@@ -6,12 +6,12 @@ class SingleListAdapter(QWidget):
         super(SingleListAdapter, self).__init__(parent)
 
         self.vBox = QVBoxLayout()
-        self.name = QLabel()
-        self.vBox.addWidget(self.name)
+        self.first = QLabel()
+        self.vBox.addWidget(self.first)
 
         self.hBox = QHBoxLayout()
         self.hBox.addLayout(self.vBox)
         self.setLayout(self.hBox)
 
-    def set_name(self, text):
-        self.name.setText(text)
+    def set_first_column_title(self, text):
+        self.first.setText(text)
