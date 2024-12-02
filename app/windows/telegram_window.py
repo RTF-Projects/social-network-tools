@@ -26,7 +26,7 @@ class TelegramWindow(QWidget):
         self.session = aiohttp.ClientSession(loop=asyncio.get_event_loop())
         self.settings_window = settings_window
 
-        self.client = TelegramClient("new session",
+        self.client = TelegramClient(self.settings_window.session_name_telegram,
                                      self.settings_window.token_telegram,
                                      self.settings_window.token_hash_telegram,
                                      system_version=self.settings_window.system_version_telegram)
