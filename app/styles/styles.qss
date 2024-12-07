@@ -1,10 +1,14 @@
 /* Общий стиль для всего окна */
 QWidget {
-    background-color: #F6FAFF !important; /* светлый фон с холодным оттенком */
+    background-color: #F6FAFF;  /* светлый фон с холодным оттенком */
     color: #333;
     font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
     font-size: 14px;
     border-radius: 0px;            /* скругления */
+}
+
+QWidget > * {
+    background-color: transparent; /* Убираем чтобы фон не наследовался криво */
 }
 
 /* Вкладки QTabWidget */
@@ -134,5 +138,78 @@ QComboBox QAbstractItemView {
     selection-color: white;
 }
 
-/* Дополнительные улучшения для окна */
+/* Сбросим стиль шрифта и цвета, чтобы не наследовать стили от родителя */
+QListWidget {
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    background-color: #ffffff !important;
+    padding: 4px;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+}
+
+/* Сброс стилей для элементов списка */
+QListWidget::item {
+    padding: 0px 1px;
+    margin-right: 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background-color: #ffffff; /* Фон элементов списка */
+    transition: background-color 0.3s ease, transform 0.2s ease-out, border-color 0.3s;
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+/* Эффект при наведении на элемент списка */
+QListWidget::item:hover {
+    background-color: rgba(0, 120, 215, 0.01); /* Светлый фон при наведении */
+    border-color: #c8d8f0; /* Лёгкая рамка при наведении */
+    transform: translateX(2px); /* Мягкий эффект смещения */
+}
+
+/* Выделенный элемент списка */
+QListWidget::item:selected {
+    background-color: rgba(0, 120, 215, 0.06); /* Голубой фон для выделенного элемента */
+    color: white; /* Белый цвет текста */
+    border-color: #0078d7; /* Контрастная обводка при выборе*/
+}
+
+/* Убираем проблему с фокусом */
+QListWidget::item:selected:focus {
+    outline: none;
+}
+
+/* Полоса прокрутки */
+QScrollBar:vertical {
+    border: none;
+    background: #f2f2f2;
+    width: 8px; /* Тонкая полоса прокрутки */
+    margin: 2px 0 2px 0;
+}
+
+QScrollBar::handle:vertical {
+    background: #ccc;
+    border-radius: 4px;
+    min-height: 20px;
+    transition: background 0.3s;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #999;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+
 
