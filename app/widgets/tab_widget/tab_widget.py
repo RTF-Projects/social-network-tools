@@ -13,7 +13,7 @@ from app.windows.statistics_window import StatisticsWindow
 class TabWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setFixedSize(1600, 1200)
+        self.setFixedSize(1920, 1200)
 
         # Главный layout
         self.layout = QVBoxLayout(self)
@@ -156,6 +156,7 @@ class TabWidget(QWidget):
         self.statistics_tab.layout.addWidget(self.statistics_window.load_button)
         self.statistics_tab.layout.addWidget(self.statistics_window.chat_activity_widget)
         self.statistics_tab.layout.addWidget(self.statistics_window.chat_selector)
+        self.statistics_tab.layout.addWidget(self.statistics_window.graph_type)
         self.statistics_tab.layout.addWidget(self.statistics_window.messages_and_participants_widget)
         self.statistics_tab.layout.addWidget(self.statistics_window.index_activity_combo_widget)
         self.statistics_tab.layout.addStretch()

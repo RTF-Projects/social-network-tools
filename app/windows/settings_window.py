@@ -2,6 +2,7 @@ import json
 import os
 
 from PyQt5.QtWidgets import QWidget, QComboBox, QPushButton, QLineEdit, QLabel
+from telethon import TelegramClient
 
 from app.const import BUTTON_HEIGHT
 from app.locales.locales import locales
@@ -31,6 +32,12 @@ class SettingsWindow(QWidget):
 
         self.init_config_file()
         self.load_configuration()
+
+        self.client = TelegramClient(self.session_name_telegram,
+                                     self.token_telegram,
+                                     self.token_hash_telegram,
+                                     system_version=self.system_version_telegram)
+
         self.configure_elements()
         self.set_texts()
 

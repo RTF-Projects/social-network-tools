@@ -13,10 +13,11 @@ class StatisticsWindow(QWidget):
     def __init__(self, settings_window):
         super().__init__()
         self.settings_window = settings_window
-        self.client = TelegramClient(self.settings_window.session_name_telegram, self.settings_window.token_telegram, self.settings_window.token_hash_telegram, system_version=self.settings_window.system_version_telegram)
+        self.client = self.settings_window.client
 
         self.chat_activity_widget = QWidget(self)
         self.chat_selector = QComboBox(self)
+        self.graph_type = QComboBox(self)
         self.messages_and_participants_widget = QWidget(self)
         self.index_activity_combo_widget = QWidget(self)
         self.participants_combo_widget = QWidget(self)
@@ -337,7 +338,7 @@ class StatisticsWindow(QWidget):
 
 
     def update_chat_activity(self):
-        top_chats = self.active_chats[:5]
+        top_chats = self.active_chats[:4]
 
         top_chat_names = [chat['title'] for chat in top_chats]
         top_chat_activity = [chat['message_count'] for chat in top_chats]
@@ -353,7 +354,7 @@ class StatisticsWindow(QWidget):
             chat_layout = QHBoxLayout()
 
             chat_label = QLabel(chat_name, self)
-            chat_label.setFixedWidth(70)
+            chat_label.setFixedWidth(200)
 
             chat_progress = QProgressBar(self)
             chat_progress.setStyleSheet("""
@@ -401,8 +402,8 @@ class StatisticsWindow(QWidget):
         values = list(self.chat_statistics['daily_counts'].values())
 
         self.messages_chat_widget.bar_graph(dates, values, title='Статистика за месяц', x_label='День(число)')
-        self.messages_chat_widget.setFixedWidth(500)
-        self.messages_chat_widget.setFixedHeight(200)
+        self.messages_chat_widget.setFixedWidth(1600)
+        self.messages_chat_widget.setFixedHeight(600)
 
 
     def update_participants(self):
@@ -422,13 +423,13 @@ class StatisticsWindow(QWidget):
         values = list(self.participants_statistics['daily_joins'].values())
 
         self.participants_chat_widget.bar_graph(dates, values, title='Статистика за месяц', x_label='День(число)')
-        self.participants_chat_widget.setFixedWidth(500)
-        self.participants_chat_widget.setFixedHeight(200)
+        self.participants_chat_widget.setFixedWidth(1600)
+        self.participants_chat_widget.setFixedHeight(600)
 
 
     def update_index_activity(self):
         self.index_activity_label.setText('Индекс активности')
-        self.index_activity_label.setFixedWidth(100)
+        self.index_activity_label.setFixedWidth(200)
 
         self.mentions_label.setText(f'Упоминаний:')
         self.mentions_label_today.setText(f"За 24 часа: {self.index_activity['mentions']['today']}")
@@ -458,28 +459,63 @@ class StatisticsWindow(QWidget):
 
         self.index_activity_chat_widget.axes.clear()
         self.index_activity_chat_widget.plot_graph(dates, data, labels, x_label='День(число)', title='Статистика за месяц')
-        self.index_activity_chat_widget.setFixedWidth(1000)
-        self.index_activity_chat_widget.setFixedHeight(300)
-
+        self.index_activity_chat_widget.setFixedWidth(1600)
+        self.index_activity_chat_widget.setFixedHeight(520)
 
     def set_texts(self):
         self.load_button.setText('Загрузить статистику')
 
+    def show_participants_combo_widget(self):
+        self.participants_combo_widget.show()
+        self.messages_combo_widget.hide()
+        self.index_activity_combo_widget.hide()
+
+    def show_messages_combo_widget(self):
+        self.participants_combo_widget.hide()
+        self.messages_combo_widget.show()
+        self.index_activity_combo_widget.hide()
+
+    def show_index_activity_combo_widget(self):
+        self.participants_combo_widget.hide()
+        self.messages_combo_widget.hide()
+        self.index_activity_combo_widget.show()
+
+    def hide_graphs(self):
+        self.participants_combo_widget.hide()
+        self.messages_combo_widget.hide()
+        self.index_activity_combo_widget.hide()
+
+    def change_graph_type(self):
+        if self.graph_type.currentText() == 'Не задано':
+            self.hide_graphs()
+        if self.graph_type.currentText() == 'Участники':
+            self.show_participants_combo_widget()
+        if self.graph_type.currentText() == 'Сообщения':
+            self.show_messages_combo_widget()
+        if self.graph_type.currentText() == 'Активность':
+            self.show_index_activity_combo_widget()
 
     def configure_elements(self):
         self.load_button.clicked.connect(self.load_data)
         self.chat_selector.currentTextChanged.connect(self.on_chat_selected)
+        self.graph_type.currentTextChanged.connect(self.change_graph_type)
 
         self.chat_selector.setFixedHeight(BUTTON_HEIGHT)
+        self.graph_type.setFixedHeight(BUTTON_HEIGHT)
+
+        self.graph_type.addItem('Не задано')
+        self.graph_type.addItem('Участники')
+        self.graph_type.addItem('Сообщения')
+        self.graph_type.addItem('Активность')
 
         self.participants_hbox.addWidget(self.participants_widget)
         self.participants_hbox.addWidget(self.participants_chat_widget)
-        self.participants_combo_widget.setFixedWidth(600)
+        self.participants_combo_widget.setFixedWidth(1600)
         self.participants_combo_widget.setLayout(self.participants_hbox)
 
         self.messages_hbox.addWidget(self.messages_widget)
         self.messages_hbox.addWidget(self.messages_chat_widget)
-        self.messages_combo_widget.setFixedWidth(600)
+        self.messages_combo_widget.setFixedWidth(1600)
         self.messages_combo_widget.setLayout(self.messages_hbox)
 
         _messages_and_participants_widget = QHBoxLayout(self)
@@ -490,6 +526,7 @@ class StatisticsWindow(QWidget):
         statistics_vbox = QVBoxLayout(self)
         statistics_vbox.addWidget(self.chat_activity_widget)
         statistics_vbox.addWidget(self.chat_selector)
+        statistics_vbox.addWidget(self.graph_type)
         statistics_vbox.addWidget(self.messages_and_participants_widget)
         statistics_vbox.addWidget(self.index_activity_combo_widget)
 
@@ -536,5 +573,7 @@ class StatisticsWindow(QWidget):
         _index_activity_widget.setLayout(self.index_activity_hbox)
         self.index_activity_vbox.addWidget(self.index_activity_label)
         self.index_activity_vbox.addWidget(_index_activity_widget)
-        self.index_activity_combo_widget.setFixedWidth(1100)
+        self.index_activity_combo_widget.setFixedWidth(1800)
         self.index_activity_combo_widget.setLayout(self.index_activity_vbox)
+
+        self.change_graph_type()
